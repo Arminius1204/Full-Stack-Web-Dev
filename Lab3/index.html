@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BillBhai · GST Billing</title>
+  <meta name="description" content="GST invoicing, stock and GSTR-1 summaries for small shop owners.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23FF5A3C'/%3E%3Cpath d='M10 9h9a4 4 0 0 1 0 8h-9zm0 8h10a4 4 0 0 1 0 8H10z' fill='none' stroke='white' stroke-width='2.6' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="topbar">
+    <div class="topbar__inner">
+      <a class="brand" href="#dashboard" aria-label="BillBhai home">
+        <span class="brand__mark" aria-hidden="true">B</span>
+        <span class="brand__text">Bill<b>Bhai</b></span>
+      </a>
+      <nav class="tabs" aria-label="Main">
+        <a href="#dashboard" data-view="dashboard">Dashboard</a>
+        <a href="#new" data-view="new">New bill</a>
+        <a href="#invoices" data-view="invoices">Invoices</a>
+        <a href="#products" data-view="products">Products</a>
+        <a href="#customers" data-view="customers">Customers</a>
+        <a href="#reports" data-view="reports">GST reports</a>
+        <a href="#settings" data-view="settings">Settings</a>
+      </nav>
+      <div class="topbar__shop">
+        <span class="status-dot" id="saveDot" title="All changes saved on this device"></span>
+        <span id="shopNameTop">—</span>
+      </div>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <!-- ================= DASHBOARD ================= -->
+    <section class="view" id="view-dashboard" aria-labelledby="h-dash">
+      <div class="hero">
+        <div>
+          <p class="eyebrow" id="dashDate">—</p>
+          <h1 id="h-dash">Your shop, <em>at a glance.</em></h1>
+          <p class="hero__sub">Sales, GST and stock for the last 30 days, compared with the 30 days before.</p>
+        </div>
+        <a href="#new" class="btn btn--primary btn--lg">+ New bill <kbd>N</kbd></a>
+      </div>
+      <div class="kpis" id="kpis"></div>
+      <div class="grid grid--2-1">
+        <article class="card">
+          <header class="card__head"><h2>Sales &amp; GST, last 6 months</h2><span class="legend"><i class="sw sw--sales"></i>Sales <i class="sw sw--tax"></i>GST</span></header>
+          <div id="monthlyChart" class="chart"></div>
+        </article>
+        <article class="card">
+          <header class="card__head"><h2>Busiest days</h2><span class="muted small">avg sales, last 90 days</span></header>
+          <div id="weekdayChart"></div>
+          <p class="insight" id="weekdayInsight"></p>
+        </article>
+      </div>
+      <div class="grid grid--3">
+        <article class="card">
+          <header class="card__head"><h2>Restock soon</h2><a href="#products" class="link">All stock →</a></header>
+          <ul class="list" id="restockList"></ul>
+        </article>
+        <article class="card">
+          <header class="card__head"><h2>Money to collect</h2><a href="#invoices" class="link" data-filter="unpaid">Unpaid →</a></header>
+          <ul class="list" id="receivableList"></ul>
+        </article>
+        <article class="card">
+          <header class="card__head"><h2>Top sellers, 30 days</h2></header>
+          <ul class="list" id="topList"></ul>
+        </article>
+      </div>
+    </section>
+
+    <!-- ================= NEW BILL ================= -->
+    <section class="view" id="view-new" aria-labelledby="h-new" hidden>
+      <div class="page-head">
+        <div><p class="eyebrow" id="nextNumber">INV/—</p><h1 id="h-new">New tax invoice</h1></div>
+        <button type="button" class="btn btn--ghost" id="clearBill">Clear bill</button>
+      </div>
+      <form id="billForm" class="bill" novalidate autocomplete="off">
+        <div class="bill__main">
+          <fieldset class="card">
+            <legend class="card__legend">Customer</legend>
+            <div class="form-grid">
+              <label class="field field--wide">
+                <span>Customer <small>leave empty for a walk-in sale</small></span>
+                <input list="customerOptions" id="billCustomer" placeholder="Search name, phone or GSTIN…">
+                <datalist id="customerOptions"></datalist>
+              </label>
+              <label class="field">
+                <span>Bill date</span>
+                <input type="date" id="billDate" required>
+              </label>
+              <label class="field">
+                <span>Customer GSTIN <small>for B2B bills</small></span>
+                <div class="input-status">
+                  <input id="billGstin" maxlength="15" placeholder="15-character GSTIN" spellcheck="false" aria-describedby="gstinStatus">
+                  <button type="button" class="btn btn--small" id="retryGstin" hidden>Retry</button>
+                </div>
+                <output id="gstinStatus" class="status" aria-live="polite"></output>
+              </label>
+              <label class="field">
+                <span>Place of supply</span>
+                <select id="billPos" required></select>
+              </label>
+              <label class="field">
+                <span>Payment</span>
+                <select id="billPayment">
+                  <option value="cash">Cash</option><option value="upi">UPI</option><option value="card">Card</option>
+                  <option value="bank">Bank transfer</option><option value="credit">On credit (unpaid)</option>
+                </select>
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset class="card">
+            <legend class="card__legend">Items</legend>
+            <div class="table-wrap">
+              <table class="lines">
+                <thead><tr><th>Product</th><th class="num">Qty</th><th class="num">Price ₹</th><th class="num">Disc ₹</th><th class="num">GST</th><th class="num">Amount</th><th><span class="sr">Remove</span></th></tr></thead>
+                <tbody id="lineRows"></tbody>
+              </table>
+            </div>
+            <div class="lines__foot">
+              <button type="button" class="btn btn--soft" id="addLine">+ Add item <kbd>Alt+A</kbd></button>
+              <div id="suggestions" class="suggest" aria-live="polite"></div>
+            </div>
+            <p class="error-text" id="linesError" role="alert"></p>
+          </fieldset>
+          <label class="field card">
+            <span>Notes on bill <small>optional</small></span>
+            <input id="billNotes" maxlength="200" placeholder="e.g. Delivered to site, Whitefield">
+          </label>
+        </div>
+
+        <aside class="bill__side">
+          <div class="card summary">
+            <h2>Bill summary</h2>
+            <dl class="totals" id="billTotals"></dl>
+            <p class="words" id="billWords"></p>
+            <button type="submit" class="btn btn--primary btn--block btn--lg" id="saveBill">Save &amp; issue invoice</button>
+            <p class="muted small center">Ctrl + Enter to save</p>
+          </div>
+          <div class="card guard">
+            <header class="card__head"><h2><span class="guard__icon" aria-hidden="true">◆</span> Invoice Guard</h2><span class="pill" id="guardCount">0</span></header>
+            <ul class="guard__list" id="guardList" aria-live="polite"></ul>
+          </div>
+        </aside>
+      </form>
+    </section>
+
+    <!-- ================= INVOICES ================= -->
+    <section class="view" id="view-invoices" aria-labelledby="h-inv" hidden>
+      <div class="page-head">
+        <div><p class="eyebrow">Sales register</p><h1 id="h-inv">Invoices</h1></div>
+        <button type="button" class="btn btn--ghost" id="exportInvoices">Export CSV</button>
+      </div>
+      <div class="card filters">
+        <label class="field field--grow"><span>Search</span><input type="search" id="invSearch" placeholder="Invoice no., customer, GSTIN or item…"></label>
+        <label class="field"><span>Status</span>
+          <select id="invStatus"><option value="all">All</option><option value="paid">Paid</option><option value="unpaid">Unpaid</option><option value="cancelled">Cancelled</option></select></label>
+        <label class="field"><span>Type</span>
+          <select id="invType"><option value="all">All</option><option value="b2b">B2B (with GSTIN)</option><option value="b2c">B2C</option><option value="inter">Inter-state</option></select></label>
+        <label class="field"><span>From</span><input type="date" id="invFrom"></label>
+        <label class="field"><span>To</span><input type="date" id="invTo"></label>
+      </div>
+      <p class="muted small" id="invSummary" aria-live="polite"></p>
+      <div class="card card--flush table-wrap">
+        <table class="table" id="invTable">
+          <thead><tr><th>Invoice</th><th>Date</th><th>Customer</th><th>Type</th><th class="num">Taxable</th><th class="num">GST</th><th class="num">Total</th><th>Status</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="pager"><button class="btn btn--ghost btn--small" id="invMore" hidden>Show more</button></div>
+    </section>
+
+    <!-- ================= PRODUCTS ================= -->
+    <section class="view" id="view-products" aria-labelledby="h-prod" hidden>
+      <div class="page-head">
+        <div><p class="eyebrow">Stock</p><h1 id="h-prod">Products</h1></div>
+        <button type="button" class="btn btn--primary" id="addProduct">+ Add product</button>
+      </div>
+      <div class="card filters">
+        <label class="field field--grow"><span>Search</span><input type="search" id="prodSearch" placeholder="Name or HSN…"></label>
+        <label class="field"><span>Show</span>
+          <select id="prodFilter"><option value="all">All products</option><option value="low">Needs restock</option><option value="mismatch">GST rate mismatch</option></select></label>
+      </div>
+      <div class="card card--flush table-wrap">
+        <table class="table" id="prodTable">
+          <thead><tr><th>Product</th><th>HSN</th><th class="num">GST</th><th class="num">Price</th><th class="num">Stock</th><th>Forecast</th><th><span class="sr">Actions</span></th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ================= CUSTOMERS ================= -->
+    <section class="view" id="view-customers" aria-labelledby="h-cust" hidden>
+      <div class="page-head">
+        <div><p class="eyebrow">Parties</p><h1 id="h-cust">Customers</h1></div>
+        <button type="button" class="btn btn--primary" id="addCustomer">+ Add customer</button>
+      </div>
+      <div class="card filters">
+        <label class="field field--grow"><span>Search</span><input type="search" id="custSearch" placeholder="Name, phone or GSTIN…"></label>
+      </div>
+      <div class="card card--flush table-wrap">
+        <table class="table" id="custTable">
+          <thead><tr><th>Customer</th><th>GSTIN</th><th>State</th><th class="num">Bills</th><th class="num">Total billed</th><th class="num">Unpaid</th><th><span class="sr">Actions</span></th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ================= REPORTS ================= -->
+    <section class="view" id="view-reports" aria-labelledby="h-rep" hidden>
+      <div class="page-head">
+        <div><p class="eyebrow">For your CA / GSTR-1</p><h1 id="h-rep">GST reports</h1></div>
+        <button type="button" class="btn btn--ghost" id="exportHsn">Export HSN summary CSV</button>
+      </div>
+      <div class="card filters">
+        <label class="field"><span>Period</span>
+          <select id="repPeriod">
+            <option value="this-month">This month</option><option value="last-month">Last month</option>
+            <option value="quarter">This quarter</option><option value="fy">This financial year</option><option value="custom">Custom…</option>
+          </select></label>
+        <label class="field"><span>From</span><input type="date" id="repFrom"></label>
+        <label class="field"><span>To</span><input type="date" id="repTo"></label>
+      </div>
+      <p class="error-text" id="repError" role="alert"></p>
+      <div id="reportBody"></div>
+    </section>
+
+    <!-- ================= SETTINGS ================= -->
+    <section class="view" id="view-settings" aria-labelledby="h-set" hidden>
+      <div class="page-head"><div><p class="eyebrow">Your shop</p><h1 id="h-set">Settings</h1></div></div>
+      <div class="grid grid--2">
+        <form class="card" id="settingsForm" novalidate>
+          <h2>Shop profile</h2>
+          <p class="muted small">Your GSTIN decides your state, and so whether a bill gets CGST + SGST or IGST.</p>
+          <label class="field"><span>Shop name</span><input name="shopName" required maxlength="80"></label>
+          <label class="field"><span>Address</span><input name="address" maxlength="160"></label>
+          <label class="field"><span>Phone</span><input name="phone" maxlength="10" inputmode="numeric"></label>
+          <label class="field"><span>GSTIN</span><input name="gstin" required maxlength="15" spellcheck="false"></label>
+          <p class="error-text" data-error-for="form"></p>
+          <button class="btn btn--primary" type="submit">Save profile</button>
+        </form>
+        <div class="stack">
+          <div class="card">
+            <h2>Backup</h2>
+            <p class="muted small">Your data is stored only in this browser. Download a backup regularly, or move it to another device.</p>
+            <div class="row">
+              <button class="btn btn--soft" id="exportBackup" type="button">Download backup</button>
+              <label class="btn btn--ghost file-btn">Restore from file<input type="file" id="importBackup" accept=".json,application/json" hidden></label>
+              <button class="btn btn--danger-ghost" id="resetDemo" type="button">Reset demo data</button>
+            </div>
+            <p class="status" id="backupStatus" aria-live="polite"></p>
+          </div>
+          <div class="card">
+            <header class="card__head"><h2>Network activity</h2>
+              <label class="switch"><input type="checkbox" id="simOutage"><span>Simulate GST portal outage</span></label></header>
+            <p class="muted small">GSTIN checks and the HSN rate list are loaded asynchronously. Turn on the outage switch to see timeouts, retries and fallbacks.</p>
+            <ul class="netlog" id="netLog"></ul>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p><strong id="footShop">—</strong> · GSTIN <span class="mono" id="footGstin">—</span> · <span id="footFy"></span></p>
+    <p class="muted small">Indicative GST rates after GST 2.0 (22 Sep 2025). Confirm rates with your CA before filing. GSTIN status checks are simulated for this demo.</p>
+  </footer>
+
+  <!-- ================= DIALOGS ================= -->
+  <dialog id="productDialog" class="dialog">
+    <form method="dialog" id="productForm" novalidate>
+      <header class="dialog__head"><h2 id="productDialogTitle">Add product</h2><button type="button" class="icon-btn" data-close aria-label="Close">×</button></header>
+      <input type="hidden" name="id">
+      <div class="form-grid">
+        <label class="field field--wide"><span>Name</span><input name="name" required maxlength="80"><small class="error-text" data-error-for="name"></small></label>
+        <label class="field"><span>HSN code</span><input name="hsn" required inputmode="numeric" maxlength="8" list="hsnOptions"><small class="hint" id="hsnHint"></small><small class="error-text" data-error-for="hsn"></small></label>
+        <datalist id="hsnOptions"></datalist>
+        <label class="field"><span>GST rate</span><select name="rate" required></select><small class="error-text" data-error-for="rate"></small></label>
+        <label class="field"><span>Selling price ₹</span><input name="price" type="number" step="0.01" min="0.01" required><small class="error-text" data-error-for="price"></small></label>
+        <label class="field"><span>Price type</span><select name="priceIncludesTax"><option value="false">Before GST</option><option value="true">MRP, GST included</option></select></label>
+        <label class="field"><span>Stock</span><input name="stock" type="number" step="1" min="0" required><small class="error-text" data-error-for="stock"></small></label>
+        <label class="field"><span>Unit</span><input name="unit" required maxlength="10" value="pcs"><small class="error-text" data-error-for="unit"></small></label>
+        <label class="field"><span>Reorder at</span><input name="reorderLevel" type="number" step="1" min="0" value="5"><small class="error-text" data-error-for="reorderLevel"></small></label>
+      </div>
+      <footer class="dialog__foot"><button type="button" class="btn btn--ghost" data-close>Cancel</button><button type="submit" class="btn btn--primary" id="productSave">Save product</button></footer>
+    </form>
+  </dialog>
+
+  <dialog id="customerDialog" class="dialog">
+    <form method="dialog" id="customerForm" novalidate>
+      <header class="dialog__head"><h2 id="customerDialogTitle">Add customer</h2><button type="button" class="icon-btn" data-close aria-label="Close">×</button></header>
+      <input type="hidden" name="id">
+      <div class="form-grid">
+        <label class="field field--wide"><span>Name</span><input name="name" required maxlength="80"><small class="error-text" data-error-for="name"></small></label>
+        <label class="field"><span>Mobile</span><input name="phone" inputmode="numeric" maxlength="10"><small class="error-text" data-error-for="phone"></small></label>
+        <label class="field"><span>GSTIN <small>optional</small></span><input name="gstin" maxlength="15" spellcheck="false"><output class="status" id="custGstinStatus" aria-live="polite"></output><small class="error-text" data-error-for="gstin"></small></label>
+        <label class="field field--wide"><span>State <small>set from GSTIN when given</small></span><select name="stateCode"></select><small class="error-text" data-error-for="stateCode"></small></label>
+      </div>
+      <footer class="dialog__foot"><button type="button" class="btn btn--ghost" data-close>Cancel</button><button type="submit" class="btn btn--primary">Save customer</button></footer>
+    </form>
+  </dialog>
+
+  <dialog id="invoiceDialog" class="dialog dialog--wide">
+    <div class="dialog__head no-print"><h2>Invoice</h2><button type="button" class="icon-btn" data-close aria-label="Close">×</button></div>
+    <div id="invoiceDoc" class="invoice-doc"></div>
+    <footer class="dialog__foot no-print" id="invoiceActions"></footer>
+  </dialog>
+
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+
+  <!-- Classic scripts (not ES modules) so the app also runs from file:// -->
+  <script src="js/utils.js"></script>
+  <script src="js/models.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/services.js"></script>
+  <script src="js/analytics.js"></script>
+  <script src="js/guard.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/views.js"></script>
+  <script src="js/billing.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
