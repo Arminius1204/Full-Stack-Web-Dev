@@ -1,0 +1,721 @@
+/* =========================================================
+   GSTKaro — GST billing & stock for a small shop
+   HTML5 + CSS only. Visual language: deep violet night,
+   glowing orbs, serif italics, glass cards, pill buttons.
+   ========================================================= */
+
+/* ---------- 1. Design tokens ---------- */
+:root {
+  --bg: #07030f;
+  --bg-2: #0c0422;
+  --ink: #f3effc;
+  --muted: #a79fbf;
+  --violet: #8736f7;
+  --violet-2: #6d28d9;
+  --magenta: #c832ff;
+  --pink: #f13de8;
+  --blue: #327dff;
+  --lilac: #f2a8ff;
+  --amber: #ffb066;
+  --ok: #5ee6a8;
+  --err: #ff7a95;
+  --focus: #f2a8ff;
+  --line: rgb(255 255 255 / .12);
+  --glass: linear-gradient(135deg, rgb(255 255 255 / .07), rgb(255 255 255 / .02));
+  --glass-solid: rgb(18 10 38 / .72);
+  --glow: 0 0 40px rgb(135 54 247 / .45);
+  --grad: linear-gradient(120deg, #8736f7, #c832ff 55%, #f13de8);
+  --bw: 1px;              /* border width, thicker in high contrast */
+  --hair: 1px;            /* invoice rules, thinner on retina */
+  --radius: 1.5rem;
+  --serif: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  --sans: "Geist", system-ui, "Segoe UI", sans-serif;
+  --mono: "Geist Mono", ui-monospace, Consolas, monospace;
+  color-scheme: dark;
+}
+
+/* Sunlight mode (manual toggle): light, high-contrast theme for a counter in daylight */
+:root:has(#sun:checked) {
+  --bg: #fbf8ff;
+  --bg-2: #ffffff;
+  --ink: #12061f;
+  --muted: #4b4560;
+  --violet: #5b1fc4;
+  --magenta: #7a14a8;
+  --lilac: #5b1fc4;
+  --amber: #8a4300;
+  --ok: #0b6b3f;
+  --err: #b0002a;
+  --focus: #5b1fc4;
+  --line: rgb(18 6 31 / .28);
+  --glass: #ffffff;
+  --glass-solid: #ffffff;
+  --glow: none;
+  --grad: linear-gradient(120deg, #4c1d95, #6b21a8);
+  --bw: 2px;
+  color-scheme: light;
+}
+
+/* ---------- 2. Base ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; scroll-padding-top: 5.5rem; }
+
+body {
+  margin: 0;
+  font-family: var(--sans);
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 50% 0, rgb(104 44 228 / .38), transparent 32rem),
+    radial-gradient(circle at 85% 45%, rgb(34 87 255 / .16), transparent 26rem),
+    radial-gradient(circle at 5% 80%, rgb(241 61 232 / .08), transparent 24rem),
+    var(--bg);
+  overflow-x: hidden;
+}
+:root:has(#sun:checked) body { background: var(--bg); }
+
+img, video, svg { display: block; max-width: 100%; height: auto; }
+a { color: var(--lilac); text-underline-offset: .2em; }
+h1, h2, h3 { font-family: var(--serif); font-weight: 500; line-height: 1.05; margin: 0; letter-spacing: -.01em; }
+h1 em, h2 em {
+  font-style: italic;
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  padding-right: .08em;
+  white-space: nowrap;   /* never split "GST-correct" at the hyphen */
+}
+p { margin: 0; }
+
+::selection { background: var(--violet); color: #fff; }
+::placeholder { color: var(--muted); opacity: .7; font-style: italic; }
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; margin: -1px;
+  overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; padding: 0;
+}
+
+/* Visible focus everywhere; hidden radios pass focus to their label */
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; border-radius: .5rem; }
+input.sr-only:focus-visible + label { outline: 3px solid var(--focus); outline-offset: 3px; }
+
+.skip {
+  position: absolute; left: 1rem; top: -4rem; z-index: 100;
+  background: var(--ink); color: var(--bg); padding: .6rem 1rem; border-radius: 99px;
+}
+.skip:focus-visible { top: 1rem; }
+
+/* ---------- 3. Shared components ---------- */
+.eyebrow {
+  font-family: var(--mono);
+  font-size: .75rem;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--lilac);
+}
+.lead { color: var(--muted); font-size: 1.075rem; max-width: 38rem; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+  min-height: 2.75rem; padding: .7rem 1.4rem;
+  border-radius: 999px;
+  font: 500 .95rem/1.2 var(--sans);
+  text-decoration: none; cursor: pointer;
+  border: var(--bw) solid transparent;
+  transition: transform .2s, box-shadow .2s, background-color .2s;
+}
+.btn-primary { background: var(--grad); color: #fff; box-shadow: var(--glow); }
+.btn-ghost { background: var(--glass); color: var(--ink); border-color: var(--line); }
+.btn:is(:hover, :focus-visible) { transform: translateY(-2px); }
+
+.card, .invoice, .wizard, .stat, .video-card, .popover, .faq details, .table-wrap {
+  background: var(--glass);
+  border: var(--bw) solid var(--line);
+  border-radius: var(--radius);
+  backdrop-filter: blur(14px);
+}
+
+.section { width: min(72rem, 100% - 2rem); margin: 0 auto; padding: 5rem 0 2rem; }
+.section-head { display: grid; gap: .9rem; margin-bottom: 2.25rem; }
+.section-head h2 { font-size: clamp(2.2rem, 1.4rem + 3.5vw, 3.75rem); }
+/* :target — the section you jumped to from the nav gets a marker */
+.section:target .eyebrow::after { content: "  ← you are here"; color: var(--amber); }
+
+/* ---------- 4. Nav ---------- */
+.nav {
+  position: sticky; top: 0; z-index: 50;
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: .75rem 1.5rem;
+  padding: .8rem max(1rem, (100% - 72rem) / 2);
+  background: rgb(7 3 15 / .6);
+  backdrop-filter: blur(16px);
+  border-bottom: var(--bw) solid var(--line);
+}
+:root:has(#sun:checked) .nav { background: rgb(251 248 255 / .92); }
+.brand { font: italic 500 1.9rem/1 var(--serif); color: var(--ink); text-decoration: none; }
+.brand span { color: var(--magenta); font-style: normal; font-size: .7em; margin-left: .1em; }
+.nav-links { display: flex; flex-wrap: wrap; gap: .25rem; list-style: none; margin: 0; padding: 0; }
+.nav-links a {
+  display: block; padding: .45rem .85rem; border-radius: 99px;
+  color: var(--muted); text-decoration: none; font-size: .92rem;
+}
+.nav-links a:is(:hover, :focus-visible) { color: var(--ink); background: rgb(255 255 255 / .06); }
+.nav-tools { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; }
+
+/* segmented control (role) and filter chips share a look */
+.seg, .filters {
+  display: inline-flex; gap: .25rem; margin: 0; padding: .25rem;
+  border: var(--bw) solid var(--line); border-radius: 99px; background: var(--glass);
+}
+.seg label, .filters label {
+  padding: .35rem .9rem; border-radius: 99px; cursor: pointer;
+  font-size: .85rem; color: var(--muted);
+}
+.seg input:checked + label, .filters input:checked + label { background: var(--grad); color: #fff; }
+
+.switch {
+  display: inline-flex; align-items: center; gap: .5rem; cursor: pointer;
+  padding: .35rem .9rem .35rem .4rem; border-radius: 99px;
+  border: var(--bw) solid var(--line); font-size: .85rem; color: var(--muted);
+}
+.switch-dot {
+  width: 2.1rem; height: 1.2rem; border-radius: 99px; background: rgb(255 255 255 / .12);
+  position: relative; transition: background-color .2s;
+}
+.switch-dot::after {
+  content: ""; position: absolute; inset: .15rem auto .15rem .15rem; aspect-ratio: 1;
+  border-radius: 50%; background: var(--ink); transition: translate .2s;
+}
+#sun:checked + .switch .switch-dot { background: var(--violet); }
+#sun:checked + .switch .switch-dot::after { translate: .9rem 0; background: #fff; }
+
+/* ---------- 5. Hero ---------- */
+.hero {
+  position: relative;
+  width: min(72rem, 100% - 2rem); margin: 0 auto;
+  padding: 5rem 0 3rem;
+  display: grid; gap: 2.5rem;
+}
+.orb {
+  position: absolute; z-index: -1; inset: 2rem auto auto 50%;
+  width: 34rem; aspect-ratio: 1; translate: -50% 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, #f13de838, #0000 48%),
+    radial-gradient(circle at 72%, #327dff38, #0000 36%),
+    radial-gradient(circle, #d73cff40, #0000 70%);
+  filter: blur(30px);
+  animation: drift 14s ease-in-out infinite alternate;
+}
+@keyframes drift { to { translate: -40% 3rem; scale: 1.15; } }
+
+.hero-copy { display: grid; gap: 1.4rem; justify-items: start; }
+.hero h1 { font-size: clamp(2.8rem, 1.6rem + 6vw, 6rem); }
+.cta { display: flex; flex-wrap: wrap; gap: .75rem; }
+
+.stats { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(10.5rem, 1fr)); gap: 1rem; }
+.stat { display: grid; gap: .2rem; padding: 1.25rem 1.4rem; }
+.stat-k { font: .72rem/1.4 var(--mono); letter-spacing: .18em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: .5rem; }
+.stat-v { font: italic 500 2.6rem/1.1 var(--serif); }
+.stat-s { color: var(--muted); font-size: .9rem; }
+.stat-alert { border-color: rgb(255 176 102 / .5); }
+.stat-alert .stat-v { color: var(--amber); }
+a.stat-s { color: var(--amber); }
+
+.pulse { width: .6rem; height: .6rem; border-radius: 50%; background: var(--amber); animation: pulse 1.6s ease-out infinite; }
+@keyframes pulse { from { box-shadow: 0 0 0 0 rgb(255 176 102 / .7); } to { box-shadow: 0 0 0 .7rem rgb(255 176 102 / 0); } }
+
+.hero-media { margin: 0; display: grid; gap: .6rem; }
+.hero-media img { border-radius: var(--radius); border: var(--bw) solid var(--line); box-shadow: 0 30px 80px -30px rgb(135 54 247 / .6); width: 100%; }
+.hero-media figcaption { font-size: .85rem; color: var(--muted); }
+
+/* ---------- 6. Ticker (marquee) ---------- */
+.ticker {
+  overflow: hidden;
+  border-block: var(--bw) solid var(--line);
+  background: rgb(135 54 247 / .08);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+.ticker-track {
+  display: flex; width: max-content; gap: 3rem;
+  list-style: none; margin: 0; padding: 1rem 0;
+  font: .85rem/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted);
+  animation: scroll 32s linear infinite;
+}
+.ticker-track li::after { content: "✦"; color: var(--magenta); margin-left: 3rem; }
+.ticker-track b { color: var(--amber); font-weight: 500; margin-right: .6rem; }
+.ticker:is(:hover, :focus-within) .ticker-track { animation-play-state: paused; }
+@keyframes scroll { to { translate: -50% 0; } }
+
+/* ---------- 7. Billing wizard ---------- */
+.bill {
+  /* All running totals live on the form. Only VISIBLE invoice rows increment them. */
+  counter-reset: sub cgst igst total line;
+  display: grid; gap: 1.5rem; align-items: start;
+}
+.wizard { padding: 1.25rem; display: grid; gap: 1.25rem; min-width: 0; }
+
+.stepper {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(5rem, 1fr)); gap: .4rem;
+  margin: 0; padding: 0; border: 0; min-width: 0;
+}
+.stepper label {
+  display: grid; justify-items: center; gap: .2rem; text-align: center;
+  padding: .6rem .3rem; border-radius: 1rem; cursor: pointer;
+  font-size: .85rem; color: var(--muted); border: var(--bw) solid transparent;
+}
+.step-n {
+  display: grid; place-items: center; width: 1.9rem; height: 1.9rem; border-radius: 50%;
+  border: var(--bw) solid var(--line); font: .8rem var(--mono);
+}
+.stepper small { font: .68rem var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--lilac); }
+.stepper input:checked + label { color: var(--ink); background: rgb(255 255 255 / .05); border-color: var(--line); }
+.stepper input:checked + label .step-n { background: var(--grad); border-color: transparent; color: #fff; }
+/* Step 3 shows a tick once at least one item is on the bill */
+.bill:has(.picker :checked) .step-items::after { content: "✓ added"; font: .68rem var(--mono); color: var(--ok); text-transform: uppercase; }
+
+/* One panel at a time, chosen by the step radio */
+.panel { display: none; margin: 0; padding: 0; border: 0; min-width: 0; }
+.bill:has(#s1:checked) .panel-1,
+.bill:has(#s2:checked) .panel-2,
+.bill:has(#s3:checked) .panel-3,
+.bill:has(#s4:checked) .panel-4 { display: grid; gap: 1rem; }
+.panel legend { font: italic 500 1.9rem/1.1 var(--serif); padding: 0; margin-bottom: 1rem; }
+.next { justify-self: start; }
+
+.options { display: grid; gap: .6rem; }
+.option {
+  display: grid; gap: .15rem; padding: .9rem 1.1rem; cursor: pointer;
+  border: var(--bw) solid var(--line); border-radius: 1rem; background: rgb(255 255 255 / .02);
+  transition: border-color .2s, background-color .2s;
+}
+.option span { color: var(--muted); font-size: .9rem; }
+.option:hover { border-color: rgb(200 50 255 / .5); }
+input:checked + .option { border-color: var(--magenta); background: rgb(200 50 255 / .1); box-shadow: inset 0 0 0 1px var(--magenta); }
+input:checked + .option strong::before { content: "● "; color: var(--magenta); }
+
+.note { font-size: .92rem; padding: .8rem 1rem; border-left: 3px solid var(--blue); background: rgb(50 125 255 / .08); border-radius: 0 .75rem .75rem 0; }
+.note-inter { display: none; }
+.bill:has(:is(#pos-tn, #pos-mh):checked) .note-inter { display: block; }
+.bill:has(:is(#pos-tn, #pos-mh):checked) .note-intra { display: none; }
+
+/* Item picker */
+.picker { list-style: none; margin: 0; padding: 0; display: grid; gap: .5rem; }
+.item {
+  position: relative;
+  display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: .3rem .8rem;
+  padding: .75rem 1rem; border: var(--bw) solid var(--line); border-radius: 1rem;
+}
+.item input { width: 1.3rem; height: 1.3rem; accent-color: var(--magenta); margin: 0; }
+.item label { display: grid; cursor: pointer; }
+.item-meta { font: .78rem var(--mono); color: var(--muted); }
+.rate::after {
+  content: attr(data-rate) " GST";
+  font: .72rem var(--mono); padding: .25rem .6rem; border-radius: 99px;
+  border: var(--bw) solid var(--line); color: var(--lilac); white-space: nowrap;
+}
+.rate-nil::after { color: var(--ok); }
+.rate-high::after { color: var(--amber); }
+.hint { grid-column: 2 / -1; font-size: .82rem; color: var(--muted); }
+
+/* :has — the card reacts to its own checkbox */
+.item:has(input:checked) { border-color: var(--magenta); background: rgb(200 50 255 / .08); }
+.item.low .item-name::after { content: "Low"; margin-left: .5rem; font: .65rem var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--amber); }
+.item:has(input:disabled) { opacity: .55; }
+.item:has(input:disabled) label { cursor: not-allowed; }
+.item:has(input:disabled) .item-name { text-decoration: line-through; }
+.item:has(input:disabled) .item-name::after { content: "Out of stock"; margin-left: .5rem; font: .65rem var(--mono); text-transform: uppercase; color: var(--err); display: inline-block; }
+
+/* Fields + CSS-only validation */
+.field { display: grid; gap: .35rem; }
+.field label { font-size: .85rem; color: var(--muted); }
+.field input {
+  font: 1rem var(--sans); color: var(--ink);
+  min-height: 2.75rem; padding: .6rem .9rem;
+  background: rgb(255 255 255 / .04); border: var(--bw) solid var(--line); border-radius: .8rem;
+}
+.field input:focus-visible { border-color: var(--magenta); }
+.msg { display: none; font-size: .82rem; }
+.msg-help { display: block; color: var(--muted); }
+.msg-err::before { content: "✕ "; }
+.msg-ok::before { content: "✓ "; }
+.msg-err { color: var(--err); }
+.msg-ok { color: var(--ok); }
+.msg-warn { color: var(--amber); }
+
+.field:has(input:user-invalid) input { border-color: var(--err); box-shadow: 0 0 0 3px rgb(255 122 149 / .18); }
+.field:has(input:user-invalid) .msg-err { display: block; }
+.field:has(input:user-invalid) .msg-help { display: none; }
+.f-gstin:has(input:valid:not(:placeholder-shown)) .msg-ok { display: block; }
+.f-gstin:has(input:valid:not(:placeholder-shown)) .msg-help { display: none; }
+.f-gstin:has(input:valid:not(:placeholder-shown)) input { border-color: var(--ok); }
+#gstin { text-transform: uppercase; font-family: var(--mono); letter-spacing: .08em; }
+
+/* Earlier choices decide which fields exist later */
+.f-gstin, .f-due { display: none; }
+.bill:has(#ct-b2b:checked) .f-gstin { display: grid; }
+.bill:has(#pay-credit:checked) .f-due { display: grid; }
+.bill:has(#ct-b2b:checked):has(#cust-name:placeholder-shown) .f-name .msg-warn { display: block; }
+
+/* Small "recap" labels that echo a choice somewhere else */
+.pick { display: none; }
+.bill:has(#ct-b2c:checked) .pick-b2c,
+.bill:has(#ct-b2b:checked) .pick-b2b,
+.bill:has(#pos-ka:checked) .pick-ka,
+.bill:has(#pos-tn:checked) .pick-tn,
+.bill:has(#pos-mh:checked) .pick-mh,
+.bill:has(:is(#pos-tn, #pos-mh):checked) .pick-other,
+.bill:has(#pay-cash:checked) .pick-cash,
+.bill:has(#pay-upi:checked) .pick-upi,
+.bill:has(#pay-credit:checked) .pick-credit { display: inline; }
+
+.kbd-hint { font-size: .9rem; color: var(--muted); }
+.hint-fine { display: none; }
+kbd { font: .8rem var(--mono); padding: .1rem .45rem; border: var(--bw) solid var(--line); border-bottom-width: 3px; border-radius: .4rem; color: var(--ink); }
+
+/* ---------- 8. Live invoice ---------- */
+.invoice { padding: 1.5rem; display: grid; gap: 1.25rem; min-width: 0; position: relative; }
+.inv-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem; border-bottom: var(--hair) solid var(--line); padding-bottom: 1.1rem; }
+.inv-kicker { display: none; }
+.inv-head h3 { font-size: 2.4rem; font-style: italic; }
+.inv-shop { font-weight: 600; }
+.inv-small { font-size: .8rem; color: var(--muted); }
+.inv-meta { margin: 0; display: grid; gap: .3rem; font-size: .85rem; }
+.inv-meta div { display: flex; flex-wrap: wrap; gap: 0 .6rem; }
+.inv-meta dt { color: var(--muted); min-width: 7.5rem; }
+.inv-meta dd { margin: 0; font-family: var(--mono); }
+
+.stamp {
+  display: none;
+  position: absolute; top: 1.2rem; right: 1.2rem; rotate: -8deg;
+  padding: .3rem .8rem; border: 2px solid var(--err); border-radius: .4rem;
+  color: var(--err); font: 600 .8rem var(--mono); letter-spacing: .2em; text-transform: uppercase;
+}
+.bill:has(#pay-credit:checked) .stamp { display: block; }
+
+.billto { display: grid; gap: .9rem; }
+.billto-k { font: .72rem var(--mono); letter-spacing: .2em; text-transform: uppercase; color: var(--lilac); }
+
+.inv-table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+.inv-table th { text-align: left; font: .7rem var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); padding: .5rem .4rem; border-bottom: var(--hair) solid var(--line); }
+.inv-table td { padding: .6rem .4rem; border-bottom: var(--hair) solid var(--line); }
+.num, .inv-table th.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* Each visible row adds its own price and tax to the running counters */
+.inv-row { counter-increment: line 1 sub var(--p) cgst var(--c) igst var(--i) total var(--t); }
+.inv-row td:first-child::before { content: counter(line) "."; font-family: var(--mono); color: var(--muted); }
+
+/* A row is removed (and stops counting) unless its item is ticked */
+.bill:not(:has(#it-atta:checked))   .inv-row[data-item="atta"],
+.bill:not(:has(#it-salt:checked))   .inv-row[data-item="salt"],
+.bill:not(:has(#it-butter:checked)) .inv-row[data-item="butter"],
+.bill:not(:has(#it-soap:checked))   .inv-row[data-item="soap"],
+.bill:not(:has(#it-cola:checked))   .inv-row[data-item="cola"],
+.bill:not(:has(#it-led:checked))    .inv-row[data-item="led"] { display: none; }
+
+.inv-empty td { text-align: center; color: var(--muted); font-style: italic; padding: 1.5rem; }
+.bill:has(.picker :checked) .inv-empty { display: none; }
+
+.totals { margin: 0; display: grid; gap: .35rem; }
+.totals div { display: flex; justify-content: space-between; gap: 1rem; }
+.totals dt { color: var(--muted); }
+.totals dd { margin: 0; font-variant-numeric: tabular-nums; }
+.totals .grand { border-top: var(--hair) solid var(--line); padding-top: .7rem; margin-top: .3rem; align-items: baseline; }
+.totals .grand dt { color: var(--ink); font-weight: 500; }
+.grand dd { font: italic 500 2.2rem/1 var(--serif); }
+
+/* Totals are printed by counters — the dd elements are empty on purpose */
+.sum-sub::after   { content: "₹" counter(sub) ".00"; }
+.sum-cgst::after  { content: "₹" counter(cgst) ".00"; }
+.sum-igst::after  { content: "₹" counter(igst) ".00"; }
+.sum-total::after { content: "₹" counter(total) ".00"; }
+
+/* Local sale → CGST + SGST; inter-state → IGST only */
+.row-inter { display: none; }
+.bill:has(:is(#pos-tn, #pos-mh):checked) .row-inter { display: flex; }
+.bill:has(:is(#pos-tn, #pos-mh):checked) .row-intra { display: none; }
+
+.paid-by { font-size: .9rem; }
+.inv-foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem; font-size: .78rem; color: var(--muted); border-top: var(--hair) solid var(--line); padding-top: 1rem; }
+.inv-foot p:first-child { flex: 1 1 16rem; }
+.sign { text-align: right; margin-left: auto; }
+.sign span { display: inline-block; margin-top: 1.6rem; border-top: var(--hair) solid var(--line); padding-top: .2rem; }
+
+/* Status line */
+.status { font: .8rem var(--mono); letter-spacing: .08em; text-transform: uppercase; padding: .7rem 1rem; border-radius: 99px; text-align: center; border: var(--bw) solid var(--line); }
+.st { display: none; }
+.bill:not(:has(.picker :checked)) .st-empty { display: inline; color: var(--muted); }
+.bill:has(.picker :checked) .st-ready { display: inline; color: var(--ok); }
+/* Blocking problems: B2B without a valid GSTIN, or credit without a due date */
+.bill:has(.picker :checked):is(:has(#ct-b2b:checked):has(#gstin:invalid), :has(#pay-credit:checked):has(#due:invalid)) .st-ready { display: none; }
+.bill:has(.picker :checked):is(:has(#ct-b2b:checked):has(#gstin:invalid), :has(#pay-credit:checked):has(#due:invalid)) .st-fix { display: inline; color: var(--err); }
+
+/* Phone bottom bar (hidden until a phone query turns it on) */
+.mobilebar { display: none; }
+
+/* ---------- 9. Stock register ---------- */
+.alert { padding: .9rem 1.2rem; border-radius: 1rem; margin-bottom: 1rem; font-size: .92rem; }
+.alert-out { display: none; background: rgb(255 122 149 / .1); border: var(--bw) solid rgb(255 122 149 / .45); }
+.alert-out::before { content: "⚠ "; color: var(--err); }
+.stock:has(tbody tr.out) .alert-out { display: block; }
+
+.staff-note { display: none; font: .8rem var(--mono); color: var(--amber); margin-bottom: 1rem; }
+body:has(#role-staff:checked) .staff-note { display: block; }
+body:has(#role-staff:checked) .owner { display: none; }
+
+.filters { margin-bottom: 1rem; flex-wrap: wrap; border-radius: 1.4rem; }
+.stock:has(#f-low:checked) tbody tr:not(.low, .out) { display: none; }
+.stock:has(#f-out:checked) tbody tr:not(.out) { display: none; }
+
+.table-wrap { overflow-x: auto; padding: .5rem 1rem; }
+.stock-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+.stock-table :is(th, td) { padding: .8rem .6rem; text-align: left; border-bottom: var(--bw) solid var(--line); }
+.stock-table thead th { font: .7rem var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.stock-table tbody th { font-weight: 500; }
+.stock-table .num { text-align: right; }
+.stock-table tbody tr:last-child :is(th, td) { border-bottom: 0; }
+/* zebra stripe, counting only rows that still have stock */
+.stock-table tbody tr:nth-child(even of :not(.out)) { background: rgb(255 255 255 / .025); }
+.stock-table tr.low th { box-shadow: inset 3px 0 0 var(--amber); }
+.stock-table tr.out { color: var(--muted); }
+.stock-table tr.out th { box-shadow: inset 3px 0 0 var(--err); }
+
+/* status label from the data attribute */
+.qty[data-status]::after {
+  content: attr(data-status);
+  margin-left: .5rem; padding: .1rem .45rem; border-radius: 99px;
+  font: .65rem var(--mono); letter-spacing: .1em; vertical-align: middle;
+  color: var(--bg); background: var(--amber);
+}
+.qty[data-status="OUT"]::after { background: var(--err); }
+.stock-table td:empty::before { content: "—"; color: var(--muted); }
+
+.upload { margin-top: 1.5rem; max-width: 34rem; }
+.upload input { font: .9rem var(--sans); color: var(--muted); }
+.upload input::file-selector-button {
+  margin-right: .9rem; padding: .55rem 1.1rem; border-radius: 99px; cursor: pointer;
+  border: 0; background: var(--grad); color: #fff; font: 500 .85rem var(--sans);
+}
+
+/* ---------- 10. Guide video ---------- */
+.video-card { margin: 0; padding: .75rem; display: grid; gap: .75rem; }
+.video-card video { width: 100%; border-radius: calc(var(--radius) - .5rem); background: #000; }
+.video-card figcaption { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; font-size: .85rem; color: var(--muted); padding: 0 .5rem .25rem; }
+.who { padding: .2rem .7rem; border-radius: 99px; font: .75rem var(--mono); border: var(--bw) solid currentColor; }
+.who-ravi { color: var(--amber); }
+.who-meera { color: var(--lilac); }
+
+/* Captions: each speaker its own colour; GST terms underlined */
+::cue { background: rgb(7 3 15 / .82); color: #f3effc; font-family: "Geist", system-ui, sans-serif; font-size: 1.05rem; }
+::cue(v[voice="Ravi"]) { color: #ffb066; }
+::cue(v[voice="Meera"]) { color: #f2a8ff; }
+::cue(.term) { color: #9fd0ff; text-decoration: underline; }
+::cue(.warn) { color: #ff8a8a; }
+
+.transcript { margin-top: 1.25rem; }
+.transcript summary, .faq summary { cursor: pointer; font-weight: 500; padding: .4rem 0; }
+.chapters { margin: 1rem 0 0; padding-left: 2rem; display: grid; gap: .6rem; color: var(--muted); }
+.chapters li::marker { content: counter(list-item) " ✦ "; color: var(--magenta); font-family: var(--mono); }
+.chapters b { color: var(--ink); font-weight: 500; }
+
+/* ---------- 11. Help: popover + FAQ ---------- */
+.popover {
+  width: min(28rem, 100% - 2rem);
+  padding: 1.75rem; color: var(--ink);
+  background: var(--bg-2);
+  box-shadow: 0 40px 100px -20px rgb(135 54 247 / .55);
+}
+.popover:popover-open { display: grid; gap: 1rem; }
+.popover h3 { font-size: 1.9rem; font-style: italic; }
+.popover::backdrop { background: rgb(7 3 15 / .7); backdrop-filter: blur(6px); }
+.slabs { list-style: none; margin: 0; padding: 0; display: grid; gap: .5rem; }
+.slabs li { display: flex; gap: .9rem; align-items: baseline; color: var(--muted); }
+.slabs b { min-width: 3rem; font: italic 500 1.6rem var(--serif); color: var(--ink); }
+
+.faq { display: grid; gap: .6rem; margin-top: 1.75rem; }
+.faq details { padding: .9rem 1.25rem; }
+.faq details p { color: var(--muted); padding-top: .4rem; }
+:is(.faq, .transcript) summary::marker { content: "+  "; color: var(--magenta); }
+:is(.faq, .transcript) details[open] summary::marker,
+.transcript[open] summary::marker { content: "–  "; }
+.faq details:has(summary:focus-visible) { border-color: var(--magenta); }
+
+/* ---------- 12. Footer ---------- */
+.site-foot {
+  width: min(72rem, 100% - 2rem); margin: 4rem auto 0; padding: 2.5rem 0 3rem;
+  border-top: var(--bw) solid var(--line);
+  display: grid; gap: .6rem; color: var(--muted); font-size: .9rem;
+}
+.credits { font-size: .8rem; }
+
+/* =========================================================
+   CONTEXT QUERIES
+   ========================================================= */
+
+/* --- Viewport: desktop / back office (range syntax) --- */
+@media (width >= 64rem) {
+  .hero { grid-template-columns: 1.1fr .9fr; align-items: center; }
+  .hero-copy { grid-column: 1; }
+  .hero-media { grid-column: 2; grid-row: 1 / span 2; }
+  .stats { grid-column: 1; }
+  .bill { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); }
+  .invoice { position: sticky; top: 5.5rem; }  /* invoice stays beside the steps */
+}
+
+/* --- Viewport: phone at the counter --- */
+@media (width < 40rem) {
+  .hero { padding-top: 2.5rem; }
+  .lead { font-size: 1rem; }
+  /* reorder alert matters most on the phone, so it comes first */
+  .stat-alert { order: -1; }
+  .nav-links { order: 3; width: 100%; justify-content: space-between; }
+
+  /* stock and invoice tables become labelled cards */
+  .stock-table thead, .inv-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .stock-table, .stock-table tbody, .stock-table tr { display: block; }
+  .stock-table tr { padding: .8rem 0; border-bottom: var(--bw) solid var(--line); }
+  .stock-table :is(th, td) { display: flex; justify-content: space-between; gap: 1rem; padding: .25rem .2rem; border: 0; text-align: right; }
+  .stock-table :is(th, td)::before { content: attr(data-label); font: .7rem var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); text-align: left; }
+  .stock-table td:empty::before { content: attr(data-label); }
+  .stock-table td:empty::after { content: "—"; }
+  .stock-table tr.low th, .stock-table tr.out th { box-shadow: none; }
+  .stock-table tr.low { box-shadow: inset 3px 0 0 var(--amber); padding-left: .6rem; }
+  .stock-table tr.out { box-shadow: inset 3px 0 0 var(--err); padding-left: .6rem; }
+
+  .inv-table, .inv-table tbody { display: block; }
+  .inv-table tr.inv-row { display: grid; grid-template-columns: auto 1fr auto; gap: 0 .6rem; padding: .6rem 0; border-bottom: var(--hair) solid var(--line); }
+  .inv-table .inv-row td { border: 0; padding: 0; }
+  .inv-row td:nth-child(3), .inv-row td:nth-child(4) { grid-column: 2; font: .75rem var(--mono); color: var(--muted); }
+  .inv-row td:nth-child(3)::before { content: "HSN "; }
+  .inv-row td:nth-child(4)::before { content: "GST "; }
+  .inv-row td:last-child { grid-column: 3; grid-row: 1; }
+  .inv-table tr.inv-empty { display: block; }
+  .inv-table .inv-empty td { display: block; }
+  .stamp { position: static; justify-self: start; }
+
+  /* thumb-reach running total */
+  .bill:has(.picker :checked) .mobilebar {
+    position: sticky; bottom: .75rem; z-index: 20;
+    display: flex; align-items: center; gap: .75rem;
+    padding: .8rem 1.2rem; border-radius: 99px;
+    background: var(--grad); color: #fff; text-decoration: none; box-shadow: var(--glow);
+  }
+  .mobilebar .sum-total { font: italic 500 1.5rem/1 var(--serif); }
+  .mobilebar-go { margin-left: auto; font-size: .85rem; }
+}
+
+/* --- Viewport: phone/tablet turned sideways — little height, so save vertical space --- */
+@media (orientation: landscape) and (height < 30rem) {
+  .nav { position: static; }
+  .hero-media, .orb { display: none; }
+  .invoice { position: static; }
+  .hero { padding-top: 2rem; }
+}
+
+/* --- Input: precise pointer with hover (mouse at the back-office PC) --- */
+@media (hover: hover) and (pointer: fine) {
+  .hint-fine { display: inline; }
+  .hint-coarse { display: none; }
+  /* slab explanation becomes a tooltip; it would be clutter for a mouse user */
+  .hint {
+    position: absolute; z-index: 5; left: 3rem; top: calc(100% - .3rem);
+    max-width: 18rem; padding: .5rem .8rem; border-radius: .7rem;
+    background: var(--bg-2); border: var(--bw) solid var(--line); box-shadow: 0 10px 30px rgb(0 0 0 / .4);
+    opacity: 0; visibility: hidden; transition: opacity .15s;
+  }
+  .item:is(:hover, :focus-within) .hint { opacity: 1; visibility: visible; }
+}
+
+/* --- Input: touch screen at the counter — bigger targets, hints always visible --- */
+@media (pointer: coarse) {
+  .item { padding: 1rem; }
+  .item input { width: 1.75rem; height: 1.75rem; }
+  .stepper label, .seg label, .filters label, .nav-links a { min-height: 3rem; display: grid; place-items: center; }
+  .option { padding: 1.1rem 1.2rem; }
+}
+/* hybrid laptop with a touchscreen: keep the step tabs finger-sized even with a mouse */
+@media (any-pointer: coarse) and (pointer: fine) {
+  .stepper label { min-height: 3rem; }
+}
+
+/* --- User preference: reduced motion — keep the meaning, drop the movement --- */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { transition-duration: .01ms !important; }
+  .orb { animation: none; }
+  /* ticker becomes a static, wrapped alert list */
+  .ticker { mask-image: none; }
+  .ticker-track { animation: none; width: auto; flex-wrap: wrap; gap: .6rem 1.5rem; padding: 1rem; justify-content: center; }
+  .ticker-track li[aria-hidden] { display: none; }
+  .ticker-track li::after { content: none; }
+  .ticker-track li::before { content: "⚠ "; color: var(--amber); }
+  /* pulsing dot → solid ring + a word, so urgency is still clear */
+  .pulse { animation: none; background: none; box-shadow: 0 0 0 2px var(--amber); }
+  .stat-alert .stat-k::after { content: "Urgent"; margin-left: auto; color: var(--amber); }
+  .btn:is(:hover, :focus-visible) { transform: none; text-decoration: underline; }
+}
+
+/* --- User preference: more contrast — solid black & yellow, no glass or glow --- */
+@media (prefers-contrast: more) {
+  :root:not(:has(#sun:checked)) {
+    --bg: #000; --bg-2: #000; --ink: #fff; --muted: #e6e6e6;
+    --lilac: #ffe14d; --magenta: #ffe14d; --violet: #ffe14d; --amber: #ffe14d;
+    --ok: #7dffb5; --err: #ff9eb0; --focus: #ffe14d;
+    --line: #fff; --glass: #000; --glass-solid: #000; --glow: none;
+    --grad: linear-gradient(#ffe14d, #ffe14d);
+    --bw: 2px;
+  }
+  body { background: var(--bg); }
+  .orb { display: none; }
+  .btn-primary, .seg input:checked + label, .filters input:checked + label,
+  .stepper input:checked + label .step-n, .mobilebar, .upload input::file-selector-button { color: #000 !important; }
+  .qty[data-status]::after { color: #000; }
+  .card, .invoice, .wizard, .stat, .video-card, .popover, .faq details, .table-wrap, .nav { backdrop-filter: none; }
+  .nav { background: #000; }
+  ::cue { background: #000; }
+}
+
+/* --- Output: high-density screens — hairline invoice rules look crisp, not heavy --- */
+@media (resolution >= 2dppx) {
+  :root { --hair: .5px; }
+}
+
+/* --- Output: print → an A4 tax invoice, nothing else --- */
+@media print {
+  @page { size: A4; margin: 14mm 12mm; }
+  :root, :root:has(#sun:checked) {
+    --ink: #000; --muted: #333; --line: #999; --lilac: #000; --amber: #000; --err: #000; --hair: .5pt;
+    color-scheme: light;
+  }
+  body { background: #fff; color: #000; font-size: 10.5pt; }
+
+  /* hide everything that is not the invoice */
+  .skip, .nav, .hero, .ticker, .section-head, .wizard, .mobilebar, .status,
+  #stock, #guide, #help, .site-foot, .msg, .f-name label { display: none !important; }
+  .f-gstin label { color: #000; font-size: 8pt; }
+  .section { padding: 0; width: 100%; }
+  .bill { display: block; }
+
+  .invoice { border: 1pt solid #000; border-radius: 0; background: none; backdrop-filter: none; padding: 8mm; position: static; gap: 5mm; }
+  .inv-kicker { display: block; font: 8pt var(--mono); letter-spacing: .2em; text-transform: uppercase; }
+  .inv-head h3 { font-style: normal; font-size: 20pt; }
+  h1 em, h2 em { color: #000; background: none; }
+
+  /* inputs print as plain filled-in text */
+  .field input { border: 0; padding: 0; min-height: 0; background: none; color: #000; box-shadow: none !important; }
+  .f-name input:placeholder-shown::placeholder { color: #000; font-style: normal; opacity: 1; }
+  .billto { gap: 1mm; }
+
+  .inv-table th, .inv-table td { border-bottom: .5pt solid #999; }
+  .inv-table tr, .totals, .inv-foot { break-inside: avoid; }
+  .inv-table thead { display: table-header-group; }   /* header repeats on page 2 */
+  .grand dd { font-style: normal; font-size: 16pt; }
+  .stamp { border-color: #000; color: #000; }
+
+  /* show where the links go — paper can't be clicked */
+  .invoice a { color: #000; text-decoration: none; }
+  .invoice a[href]::after { content: " (" attr(href) ")"; font: 8pt var(--mono); word-break: break-all; }
+}

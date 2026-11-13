@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 680" role="img" aria-labelledby="t">
+<title id="t">High-contrast dashboard: invoice total and stock chart in black and yellow, readable in sunlight</title>
+<rect width="1200" height="680" fill="#000"/>
+<g font-family="Segoe UI, sans-serif" fill="#fff">
+<rect x="70" y="80" width="470" height="520" rx="12" fill="none" stroke="#fff" stroke-width="4"/>
+<text x="110" y="150" font-size="22" font-weight="700" fill="#ffe14d">TAX INVOICE</text>
+<text x="110" y="205" font-size="34" font-weight="700">Sharma General Store</text>
+<text x="110" y="300" font-size="24">Atta 5 kg ........ ₹280</text>
+<text x="110" y="345" font-size="24">Soap 4 pk ........ ₹160</text>
+<text x="110" y="390" font-size="24">LED 9 W ........... ₹200</text>
+<text x="110" y="435" font-size="24">IGST ................. ₹58</text>
+<text x="110" y="530" font-size="52" font-weight="800" fill="#ffe14d">₹698.00</text>
+<rect x="590" y="80" width="540" height="520" rx="12" fill="none" stroke="#fff" stroke-width="4"/>
+<text x="630" y="150" font-size="22" font-weight="700" fill="#ffe14d">STOCK</text>
+<g font-size="18" font-weight="700" text-anchor="middle">
+<rect x="650" y="300" width="56" height="230" fill="#fff"/><text x="678" y="565">ATTA</text>
+<rect x="730" y="340" width="56" height="190" fill="#fff"/><text x="758" y="565">SOAP</text>
+<rect x="810" y="490" width="56" height="40" fill="#ffe14d"/><text x="838" y="565" fill="#ffe14d">BUTTER ⚠</text>
+<rect x="890" y="380" width="56" height="150" fill="#fff"/><text x="918" y="565">LED</text>
+<rect x="970" y="510" width="56" height="20" fill="#ffe14d"/><text x="998" y="565" fill="#ffe14d">SALT ⚠</text>
+</g>
+</g>
+</svg>

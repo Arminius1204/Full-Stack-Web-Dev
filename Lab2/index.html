@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GSTKaro — GST Billing &amp; Stock for Small Shops</title>
+  <meta name="description" content="GST-correct invoices and a live stock register for a small kirana shop. Built with HTML5 and CSS only.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,400;1,500&family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<a class="skip" href="#bill">Skip to new bill</a>
+
+<!-- ============ NAV ============ -->
+<header class="nav">
+  <a class="brand" href="#top" aria-label="GSTKaro home">GSTKaro<span aria-hidden="true">✦</span></a>
+
+  <nav aria-label="Sections">
+    <ul class="nav-links">
+      <li><a href="#bill">New bill</a></li>
+      <li><a href="#stock">Stock</a></li>
+      <li><a href="#guide">Guide</a></li>
+      <li><a href="#help">Help</a></li>
+    </ul>
+  </nav>
+
+  <div class="nav-tools">
+    <!-- Role switch: Staff cannot see cost price or margin -->
+    <fieldset class="seg" aria-label="Signed in as">
+      <legend class="sr-only">Signed in as</legend>
+      <input type="radio" name="role" id="role-owner" class="sr-only" checked>
+      <label for="role-owner">Owner</label>
+      <input type="radio" name="role" id="role-staff" class="sr-only">
+      <label for="role-staff">Staff</label>
+    </fieldset>
+
+    <!-- Sunlight mode: manual high-contrast light theme for a counter in daylight -->
+    <input type="checkbox" id="sun" class="sr-only">
+    <label for="sun" class="switch"><span class="switch-dot" aria-hidden="true"></span>Sunlight</label>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- ============ HERO ============ -->
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="orb" aria-hidden="true"></div>
+
+    <div class="hero-copy">
+      <p class="eyebrow">✦ GST billing · Stock register · Sharma General Store</p>
+      <h1 id="hero-title">Every bill <em>GST-correct.</em><br> Every shelf <em>counted.</em></h1>
+      <p class="lead">Raise a tax invoice in four taps, see what's running low before a customer asks, and print a proper A4 invoice — from the counter phone or the back-office PC.</p>
+      <div class="cta">
+        <a class="btn btn-primary" href="#bill">Start a bill</a>
+        <a class="btn btn-ghost" href="#guide">Watch the 54-sec guide</a>
+      </div>
+    </div>
+
+    <ul class="stats" aria-label="Today at a glance">
+      <li class="stat"><span class="stat-k">Today's sales</span><span class="stat-v">₹8,460</span><span class="stat-s">23 bills</span></li>
+      <li class="stat"><span class="stat-k">GST collected</span><span class="stat-v">₹612</span><span class="stat-s">File GSTR-1 by 11 Dec</span></li>
+      <li class="stat stat-alert"><span class="stat-k"><span class="pulse" aria-hidden="true"></span>Need reorder</span><span class="stat-v">3 items</span><a class="stat-s" href="#stock">Open stock register →</a></li>
+    </ul>
+
+    <!-- Art direction: a different image per context, not just a different size -->
+    <figure class="hero-media">
+      <picture>
+        <source media="(prefers-contrast: more)" srcset="media/counter-contrast.svg">
+        <source media="(orientation: portrait) and (width < 40rem)" srcset="media/counter-phone.svg">
+        <img src="media/counter-wide.svg" width="1200" height="680"
+             alt="Dashboard showing today's invoice for ₹698 next to a stock chart where butter and salt are below the reorder line.">
+      </picture>
+      <figcaption>Counter dashboard. On a phone held upright you see only today's total and what to reorder.</figcaption>
+    </figure>
+  </section>
+
+  <!-- ============ TICKER ============ -->
+  <div class="ticker" role="region" aria-label="Stock and filing alerts">
+    <ul class="ticker-track">
+      <li><b>Low stock</b> Amul Butter 500 g — 2 left</li>
+      <li><b>Low stock</b> Tata Salt 1 kg — 4 left</li>
+      <li><b>Out</b> India Gate Basmati 1 kg</li>
+      <li><b>Due</b> GSTR-1 on 11 Dec</li>
+      <li><b>Due</b> GSTR-3B on 20 Dec</li>
+      <!-- duplicate set so the loop is seamless; hidden from screen readers -->
+      <li aria-hidden="true"><b>Low stock</b> Amul Butter 500 g — 2 left</li>
+      <li aria-hidden="true"><b>Low stock</b> Tata Salt 1 kg — 4 left</li>
+      <li aria-hidden="true"><b>Out</b> India Gate Basmati 1 kg</li>
+      <li aria-hidden="true"><b>Due</b> GSTR-1 on 11 Dec</li>
+      <li aria-hidden="true"><b>Due</b> GSTR-3B on 20 Dec</li>
+    </ul>
+  </div>
+
+  <!-- ============ NEW BILL (wizard + live invoice) ============ -->
+  <section id="bill" class="section" aria-labelledby="bill-title">
+    <header class="section-head">
+      <p class="eyebrow">✦ 01 · New bill</p>
+      <h2 id="bill-title">Four steps. <em>Zero tax mistakes.</em></h2>
+      <p class="lead">Your answers decide what the invoice shows — CGST + SGST for a local sale, IGST for another state, a GSTIN box only for businesses.</p>
+    </header>
+
+    <form class="bill" action="#" autocomplete="off">
+
+      <div class="wizard">
+        <!-- Step tabs: radios, so arrow keys move between steps -->
+        <fieldset class="stepper">
+          <legend class="sr-only">Billing steps (use arrow keys to move)</legend>
+          <input type="radio" name="step" id="s1" class="sr-only" checked>
+          <label for="s1"><span class="step-n">1</span>Customer
+            <small class="pick pick-b2c">Walk-in</small><small class="pick pick-b2b">Business</small></label>
+          <input type="radio" name="step" id="s2" class="sr-only">
+          <label for="s2"><span class="step-n">2</span>Supply
+            <small class="pick pick-ka">Same state</small><small class="pick pick-other">Inter-state</small></label>
+          <input type="radio" name="step" id="s3" class="sr-only">
+          <label for="s3" class="step-items"><span class="step-n">3</span>Items</label>
+          <input type="radio" name="step" id="s4" class="sr-only">
+          <label for="s4"><span class="step-n">4</span>Payment</label>
+        </fieldset>
+
+        <!-- Step 1 -->
+        <fieldset class="panel panel-1">
+          <legend>Who is buying?</legend>
+          <div class="options">
+            <input type="radio" name="ctype" id="ct-b2c" class="sr-only" checked>
+            <label for="ct-b2c" class="option">
+              <strong>Walk-in customer</strong>
+              <span>B2C · no GSTIN needed. Most counter sales.</span>
+            </label>
+            <input type="radio" name="ctype" id="ct-b2b" class="sr-only">
+            <label for="ct-b2b" class="option">
+              <strong>Registered business</strong>
+              <span>B2B · their GSTIN goes on the invoice so they can claim input tax credit.</span>
+            </label>
+          </div>
+          <label for="s2" class="btn btn-ghost next">Next: place of supply →</label>
+        </fieldset>
+
+        <!-- Step 2 -->
+        <fieldset class="panel panel-2">
+          <legend>Where is the buyer?</legend>
+          <div class="options">
+            <input type="radio" name="pos" id="pos-ka" class="sr-only" checked>
+            <label for="pos-ka" class="option"><strong>Karnataka (29)</strong><span>Same state as the shop → CGST + SGST</span></label>
+            <input type="radio" name="pos" id="pos-tn" class="sr-only">
+            <label for="pos-tn" class="option"><strong>Tamil Nadu (33)</strong><span>Other state → IGST</span></label>
+            <input type="radio" name="pos" id="pos-mh" class="sr-only">
+            <label for="pos-mh" class="option"><strong>Maharashtra (27)</strong><span>Other state → IGST</span></label>
+          </div>
+          <p class="note note-intra">Local sale: the tax is split half to the Centre (CGST) and half to Karnataka (SGST).</p>
+          <p class="note note-inter">Inter-state sale: the full rate is charged as IGST. CGST and SGST rows are removed from the invoice.</p>
+          <label for="s3" class="btn btn-ghost next">Next: add items →</label>
+        </fieldset>
+
+        <!-- Step 3 -->
+        <fieldset class="panel panel-3">
+          <legend>Add items</legend>
+          <ul class="picker">
+            <li class="item">
+              <input type="checkbox" id="it-atta">
+              <label for="it-atta"><span class="item-name">Aashirvaad Atta 5 kg</span><span class="item-meta">HSN 1101 · ₹280</span></label>
+              <span class="rate" data-rate="5%"></span>
+              <span class="hint">Packaged, labelled flour falls in the 5% slab.</span>
+            </li>
+            <li class="item">
+              <input type="checkbox" id="it-salt">
+              <label for="it-salt"><span class="item-name">Tata Salt 1 kg</span><span class="item-meta">HSN 2501 · ₹28</span></label>
+              <span class="rate rate-nil" data-rate="Nil"></span>
+              <span class="hint">Common salt is nil-rated — no GST is added.</span>
+            </li>
+            <li class="item low">
+              <input type="checkbox" id="it-butter">
+              <label for="it-butter"><span class="item-name">Amul Butter 500 g</span><span class="item-meta">HSN 0405 · ₹240</span></label>
+              <span class="rate" data-rate="5%"></span>
+              <span class="hint">Only 2 left — reorder from Metro Dairy.</span>
+            </li>
+            <li class="item">
+              <input type="checkbox" id="it-soap">
+              <label for="it-soap"><span class="item-name">Lux Soap, pack of 4</span><span class="item-meta">HSN 3401 · ₹160</span></label>
+              <span class="rate" data-rate="5%"></span>
+              <span class="hint">Toilet soap moved to the 5% slab under GST 2.0.</span>
+            </li>
+            <li class="item">
+              <input type="checkbox" id="it-cola">
+              <label for="it-cola"><span class="item-name">Thums Up 2 L</span><span class="item-meta">HSN 2202 · ₹100</span></label>
+              <span class="rate rate-high" data-rate="40%"></span>
+              <span class="hint">Aerated drinks are in the 40% special slab.</span>
+            </li>
+            <li class="item">
+              <input type="checkbox" id="it-led">
+              <label for="it-led"><span class="item-name">Philips LED bulb 9 W</span><span class="item-meta">HSN 8539 · ₹200</span></label>
+              <span class="rate" data-rate="18%"></span>
+              <span class="hint">Electrical goods are in the standard 18% slab.</span>
+            </li>
+            <li class="item out">
+              <input type="checkbox" id="it-rice" disabled>
+              <label for="it-rice"><span class="item-name">India Gate Basmati 1 kg</span><span class="item-meta">HSN 1006 · ₹120</span></label>
+              <span class="rate" data-rate="5%"></span>
+              <span class="hint">Out of stock — cannot be billed until the next purchase entry.</span>
+            </li>
+          </ul>
+          <label for="s4" class="btn btn-ghost next">Next: payment →</label>
+        </fieldset>
+
+        <!-- Step 4 -->
+        <fieldset class="panel panel-4">
+          <legend>How are they paying?</legend>
+          <div class="options">
+            <input type="radio" name="pay" id="pay-cash" class="sr-only" checked>
+            <label for="pay-cash" class="option"><strong>Cash</strong><span>Paid at the counter.</span></label>
+            <input type="radio" name="pay" id="pay-upi" class="sr-only">
+            <label for="pay-upi" class="option"><strong>UPI</strong><span>The UPI link is printed on the invoice.</span></label>
+            <input type="radio" name="pay" id="pay-credit" class="sr-only">
+            <label for="pay-credit" class="option"><strong>Credit (udhaar)</strong><span>Needs a due date. Invoice is stamped PAYMENT DUE.</span></label>
+          </div>
+          <div class="field f-due">
+            <label for="due">Payment due on</label>
+            <input type="date" id="due" required min="2026-11-11">
+            <span class="msg msg-err">Pick a due date for a credit sale.</span>
+          </div>
+          <p class="kbd-hint"><span class="hint-fine">Bill ready? Press <kbd>Ctrl</kbd> + <kbd>P</kbd> to print the A4 invoice.</span><span class="hint-coarse">Bill ready? Use your browser's <b>Share → Print</b> to print or save as PDF.</span></p>
+        </fieldset>
+      </div>
+
+      <!-- ============ LIVE INVOICE (this is what prints) ============ -->
+      <article class="invoice" id="invoice" aria-labelledby="inv-title">
+        <header class="inv-head">
+          <div>
+            <p class="inv-kicker">Original for recipient</p>
+            <h3 id="inv-title">Tax Invoice</h3>
+            <p class="inv-shop">Sharma General Store</p>
+            <p class="inv-small">14, 3rd Cross, Jayanagar, Bengaluru 560011 · GSTIN 29ABCDE1234F1Z5</p>
+          </div>
+          <dl class="inv-meta">
+            <div><dt>Invoice no.</dt><dd>INV/2026-27/0142</dd></div>
+            <div><dt>Date</dt><dd>11 Nov 2026</dd></div>
+            <div><dt>Place of supply</dt><dd><span class="pick pick-ka">Karnataka (29)</span><span class="pick pick-tn">Tamil Nadu (33)</span><span class="pick pick-mh">Maharashtra (27)</span></dd></div>
+          </dl>
+          <p class="stamp" aria-label="Payment due">Payment due</p>
+        </header>
+
+        <div class="billto">
+          <p class="billto-k">Bill to</p>
+          <div class="field f-name">
+            <label for="cust-name">Customer / business name</label>
+            <input type="text" id="cust-name" placeholder="Walk-in customer">
+            <span class="msg msg-warn">A business name is required on a B2B invoice.</span>
+          </div>
+          <div class="field f-gstin">
+            <label for="gstin">Buyer GSTIN</label>
+            <input type="text" id="gstin" required maxlength="15" spellcheck="false"
+                   pattern="[0-9]{2}[A-Za-z]{5}[0-9]{4}[A-Za-z][1-9A-Za-z][Zz][0-9A-Za-z]"
+                   placeholder="33AAACR4849R1ZK" aria-describedby="gstin-help">
+            <span class="msg msg-help" id="gstin-help">15 characters: state code, PAN, entity no., Z, check digit.</span>
+            <span class="msg msg-err">That isn't a valid GSTIN format — check the 15 characters.</span>
+            <span class="msg msg-ok">GSTIN format looks right.</span>
+          </div>
+        </div>
+
+        <table class="inv-table">
+          <caption class="sr-only">Items on this invoice</caption>
+          <thead>
+            <tr><th scope="col">#</th><th scope="col">Item</th><th scope="col">HSN</th><th scope="col">GST</th><th scope="col" class="num">Taxable ₹</th></tr>
+          </thead>
+          <tbody>
+            <!-- --p price, --c CGST (= SGST), --i IGST, --t line total. Hidden rows do not count. -->
+            <tr class="inv-row" data-item="atta"   style="--p:280; --c:7;  --i:14; --t:294"><td></td><td data-label="Item">Aashirvaad Atta 5 kg</td><td data-label="HSN">1101</td><td data-label="GST">5%</td><td data-label="Taxable ₹" class="num">280.00</td></tr>
+            <tr class="inv-row" data-item="salt"   style="--p:28;  --c:0;  --i:0;  --t:28"><td></td><td data-label="Item">Tata Salt 1 kg</td><td data-label="HSN">2501</td><td data-label="GST">Nil</td><td data-label="Taxable ₹" class="num">28.00</td></tr>
+            <tr class="inv-row" data-item="butter" style="--p:240; --c:6;  --i:12; --t:252"><td></td><td data-label="Item">Amul Butter 500 g</td><td data-label="HSN">0405</td><td data-label="GST">5%</td><td data-label="Taxable ₹" class="num">240.00</td></tr>
+            <tr class="inv-row" data-item="soap"   style="--p:160; --c:4;  --i:8;  --t:168"><td></td><td data-label="Item">Lux Soap, pack of 4</td><td data-label="HSN">3401</td><td data-label="GST">5%</td><td data-label="Taxable ₹" class="num">160.00</td></tr>
+            <tr class="inv-row" data-item="cola"   style="--p:100; --c:20; --i:40; --t:140"><td></td><td data-label="Item">Thums Up 2 L</td><td data-label="HSN">2202</td><td data-label="GST">40%</td><td data-label="Taxable ₹" class="num">100.00</td></tr>
+            <tr class="inv-row" data-item="led"    style="--p:200; --c:18; --i:36; --t:236"><td></td><td data-label="Item">Philips LED bulb 9 W</td><td data-label="HSN">8539</td><td data-label="GST">18%</td><td data-label="Taxable ₹" class="num">200.00</td></tr>
+            <tr class="inv-empty"><td colspan="5">No items yet. Tick items in step 3 and they appear here.</td></tr>
+          </tbody>
+        </table>
+
+        <dl class="totals">
+          <div><dt>Taxable value</dt><dd class="sum sum-sub"></dd></div>
+          <div class="row-intra"><dt>CGST</dt><dd class="sum sum-cgst"></dd></div>
+          <div class="row-intra"><dt>SGST</dt><dd class="sum sum-cgst"></dd></div>
+          <div class="row-inter"><dt>IGST</dt><dd class="sum sum-igst"></dd></div>
+          <div class="grand"><dt>Invoice total</dt><dd class="sum sum-total"></dd></div>
+        </dl>
+
+        <p class="paid-by">
+          <span class="pick pick-cash">Paid in cash.</span>
+          <span class="pick pick-upi">Pay by UPI: <a href="upi://pay?pa=sharmastore@okaxis&amp;pn=Sharma%20General%20Store&amp;cu=INR">sharmastore@okaxis</a></span>
+          <span class="pick pick-credit">Credit sale — balance payable by the due date above.</span>
+        </p>
+
+        <footer class="inv-foot">
+          <p>Goods once sold are exchanged within 7 days with bill. Returns policy: <a href="https://sharmastore.example/returns">sharmastore.example/returns</a></p>
+          <p class="sign">for Sharma General Store<br><span>Authorised signatory</span></p>
+        </footer>
+
+        <!-- Status line: driven entirely by :has() on the form -->
+        <p class="status" role="status">
+          <span class="st st-empty">Bill is empty — add at least one item.</span>
+          <span class="st st-fix">Fix the highlighted field before printing.</span>
+          <span class="st st-ready">Ready to print ✓</span>
+        </p>
+      </article>
+
+      <!-- Phone only: running total stays in reach of the thumb -->
+      <a class="mobilebar" href="#invoice">
+        <span>Total</span><span class="sum sum-total"></span><span class="mobilebar-go">Review bill ↑</span>
+      </a>
+    </form>
+  </section>
+
+  <!-- ============ STOCK ============ -->
+  <section id="stock" class="section stock" aria-labelledby="stock-title">
+    <header class="section-head">
+      <p class="eyebrow">✦ 02 · Stock register</p>
+      <h2 id="stock-title">Know what's <em>running out</em> before the customer does.</h2>
+    </header>
+
+    <p class="alert alert-out">1 item is out of stock and blocked from billing. Record a purchase to unblock it.</p>
+    <p class="staff-note">Staff view — cost price and margin are hidden.</p>
+
+    <div class="filters" role="radiogroup" aria-label="Show">
+      <input type="radio" name="filter" id="f-all" class="sr-only" checked><label for="f-all">All items</label>
+      <input type="radio" name="filter" id="f-low" class="sr-only"><label for="f-low">Needs reorder</label>
+      <input type="radio" name="filter" id="f-out" class="sr-only"><label for="f-out">Out of stock</label>
+    </div>
+
+    <div class="table-wrap">
+      <table class="stock-table">
+        <caption class="sr-only">Current stock with reorder levels</caption>
+        <thead>
+          <tr>
+            <th scope="col">Item</th><th scope="col">HSN</th><th scope="col">GST</th>
+            <th scope="col" class="num">In stock</th><th scope="col" class="num">Reorder at</th>
+            <th scope="col" class="num owner">Cost ₹</th><th scope="col" class="num">MRP ₹</th>
+            <th scope="col" class="num owner">Margin</th><th scope="col">Supplier note</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row" data-label="Item">Aashirvaad Atta 5 kg</th><td data-label="HSN">1101</td><td data-label="GST">5%</td><td data-label="In stock" class="num qty">18</td><td data-label="Reorder at" class="num">6</td><td data-label="Cost ₹" class="num owner">252</td><td data-label="MRP ₹" class="num">294</td><td data-label="Margin" class="num owner">11%</td><td data-label="Supplier note"></td></tr>
+          <tr class="low"><th scope="row" data-label="Item">Tata Salt 1 kg</th><td data-label="HSN">2501</td><td data-label="GST">Nil</td><td data-label="In stock" class="num qty" data-status="LOW">4</td><td data-label="Reorder at" class="num">10</td><td data-label="Cost ₹" class="num owner">24</td><td data-label="MRP ₹" class="num">28</td><td data-label="Margin" class="num owner">14%</td><td data-label="Supplier note">Krishna Traders, Tue delivery</td></tr>
+          <tr class="low"><th scope="row" data-label="Item">Amul Butter 500 g</th><td data-label="HSN">0405</td><td data-label="GST">5%</td><td data-label="In stock" class="num qty" data-status="LOW">2</td><td data-label="Reorder at" class="num">6</td><td data-label="Cost ₹" class="num owner">228</td><td data-label="MRP ₹" class="num">252</td><td data-label="Margin" class="num owner">10%</td><td data-label="Supplier note">Metro Dairy, keep chilled</td></tr>
+          <tr><th scope="row" data-label="Item">Lux Soap, pack of 4</th><td data-label="HSN">3401</td><td data-label="GST">5%</td><td data-label="In stock" class="num qty">26</td><td data-label="Reorder at" class="num">8</td><td data-label="Cost ₹" class="num owner">138</td><td data-label="MRP ₹" class="num">168</td><td data-label="Margin" class="num owner">18%</td><td data-label="Supplier note"></td></tr>
+          <tr><th scope="row" data-label="Item">Thums Up 2 L</th><td data-label="HSN">2202</td><td data-label="GST">40%</td><td data-label="In stock" class="num qty">12</td><td data-label="Reorder at" class="num">6</td><td data-label="Cost ₹" class="num owner">118</td><td data-label="MRP ₹" class="num">140</td><td data-label="Margin" class="num owner">16%</td><td data-label="Supplier note"></td></tr>
+          <tr><th scope="row" data-label="Item">Philips LED bulb 9 W</th><td data-label="HSN">8539</td><td data-label="GST">18%</td><td data-label="In stock" class="num qty">9</td><td data-label="Reorder at" class="num">4</td><td data-label="Cost ₹" class="num owner">188</td><td data-label="MRP ₹" class="num">236</td><td data-label="Margin" class="num owner">20%</td><td data-label="Supplier note">Warranty card inside box</td></tr>
+          <tr class="out"><th scope="row" data-label="Item">India Gate Basmati 1 kg</th><td data-label="HSN">1006</td><td data-label="GST">5%</td><td data-label="In stock" class="num qty" data-status="OUT">0</td><td data-label="Reorder at" class="num">10</td><td data-label="Cost ₹" class="num owner">104</td><td data-label="MRP ₹" class="num">126</td><td data-label="Margin" class="num owner">17%</td><td data-label="Supplier note"></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="field upload">
+      <label for="purchase">Record a purchase — attach the supplier's bill (photo or PDF)</label>
+      <input type="file" id="purchase" accept="image/*,.pdf">
+    </div>
+  </section>
+
+  <!-- ============ GUIDE VIDEO ============ -->
+  <section id="guide" class="section guide" aria-labelledby="guide-title">
+    <header class="section-head">
+      <p class="eyebrow">✦ 03 · Guide</p>
+      <h2 id="guide-title">Billing a customer from <em>another state.</em></h2>
+      <p class="lead">Ravi, the shop owner, asks Meera, his accountant, how to bill a buyer from Chennai. Captions colour each speaker and highlight GST terms.</p>
+    </header>
+
+    <figure class="video-card">
+      <video controls preload="metadata" poster="media/guide-poster.jpg" width="1280" height="720">
+        <source src="media/billing-guide.mp4" type="video/mp4">
+        <track kind="captions" src="captions.vtt" srclang="en" label="English captions" default>
+        <track kind="chapters" src="chapters.vtt" srclang="en" label="Chapters">
+        Your browser can't play this video. <a href="media/billing-guide.mp4">Download the guide (MP4, 0.5 MB)</a>.
+      </video>
+      <figcaption>
+        <span class="who who-ravi">Ravi · owner</span>
+        <span class="who who-meera">Meera · accountant</span>
+        54 seconds · captions on by default
+      </figcaption>
+    </figure>
+
+    <details class="transcript">
+      <summary>Read the transcript</summary>
+      <ol class="chapters">
+        <li><b>The problem.</b> Ravi: A customer from Chennai wants a bag of atta and some soap. How do I bill this?</li>
+        <li><b>Customer type and place of supply.</b> Meera: Pick the customer type — they have a GSTIN, so choose business. Chennai is in Tamil Nadu, another state.</li>
+        <li><b>IGST vs CGST + SGST.</b> Meera: For an inter-state sale the bill shows IGST at the full rate. Out-of-stock items are greyed out.</li>
+        <li><b>Printing.</b> Meera: Press Ctrl + P. The page prints as a proper A4 tax invoice.</li>
+      </ol>
+    </details>
+  </section>
+
+  <!-- ============ HELP ============ -->
+  <section id="help" class="section help" aria-labelledby="help-title">
+    <header class="section-head">
+      <p class="eyebrow">✦ 04 · Help</p>
+      <h2 id="help-title">Questions shopkeepers <em>actually ask.</em></h2>
+    </header>
+
+    <button class="btn btn-primary" type="button" popovertarget="rates">Which GST rate applies?</button>
+
+    <div id="rates" popover class="popover">
+      <h3>GST 2.0 slabs at a glance</h3>
+      <ul class="slabs">
+        <li><b>Nil</b> Salt, fresh milk, unbranded atta</li>
+        <li><b>5%</b> Packaged food, butter, soap, toothpaste</li>
+        <li><b>18%</b> Electricals, most other goods</li>
+        <li><b>40%</b> Aerated drinks, tobacco</li>
+      </ul>
+      <p class="inv-small">Illustrative only — confirm the rate for each HSN on the CBIC portal.</p>
+      <button class="btn btn-ghost" type="button" popovertarget="rates" popovertargetaction="hide">Close</button>
+    </div>
+
+    <div class="faq">
+      <details name="faq">
+        <summary>When do I charge IGST instead of CGST + SGST?</summary>
+        <p>When the place of supply is a different state from your shop. Karnataka to Karnataka is CGST + SGST; Karnataka to Tamil Nadu is IGST.</p>
+      </details>
+      <details name="faq">
+        <summary>Do walk-in customers need a GSTIN?</summary>
+        <p>No. Only registered businesses give a GSTIN, so they can claim input tax credit on what they buy from you.</p>
+      </details>
+      <details name="faq">
+        <summary>Why can't I bill an item that is out of stock?</summary>
+        <p>Billing it would push stock below zero and your register would no longer match the shelf. Record the purchase first.</p>
+      </details>
+    </div>
+  </section>
+</main>
+
+<footer class="site-foot">
+  <p class="brand">GSTKaro<span aria-hidden="true">✦</span></p>
+  <p>GST billing and stock for small shops. Built with HTML5 and CSS only — no JavaScript.</p>
+  <p class="credits">Media credits: guide video, poster and SVG illustrations created for this lab; voices synthesised with Windows text-to-speech (Microsoft David, Microsoft Zira). Fonts: Cormorant Garamond, Geist, Geist Mono (SIL Open Font Licence, via Google Fonts).</p>
+</footer>
+
+</body>
+</html>

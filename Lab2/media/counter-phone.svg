@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 760" role="img" aria-labelledby="t">
+<title id="t">Phone view: today's sales total and the two items to reorder before closing</title>
+<defs>
+<radialGradient id="g1" cx="50%" cy="10%" r="70%"><stop offset="0" stop-color="#682ce4" stop-opacity=".6"/><stop offset="1" stop-color="#07030f" stop-opacity="0"/></radialGradient>
+<linearGradient id="glass" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity=".1"/><stop offset="1" stop-color="#ffffff" stop-opacity=".02"/></linearGradient>
+</defs>
+<rect width="600" height="760" fill="#07030f"/><rect width="600" height="760" fill="url(#g1)"/>
+<g font-family="Georgia, serif" fill="#f3effc">
+<text x="300" y="110" font-size="18" font-family="Consolas, monospace" fill="#f2a8ff" letter-spacing="4" text-anchor="middle">TODAY · 11 NOV</text>
+<text x="300" y="200" font-size="84" font-style="italic" text-anchor="middle">₹8,460</text>
+<text x="300" y="245" font-size="20" font-family="Segoe UI, sans-serif" fill="#a79fbf" text-anchor="middle">23 bills · ₹612 GST collected</text>
+<rect x="50" y="300" width="500" height="170" rx="28" fill="url(#glass)" stroke="#ffb066" stroke-opacity=".6"/>
+<circle cx="100" cy="355" r="10" fill="#ffb066"/>
+<text x="130" y="363" font-size="26" font-family="Segoe UI, sans-serif">Amul Butter 500 g</text>
+<text x="130" y="400" font-size="20" font-family="Consolas, monospace" fill="#ffb066">2 LEFT · REORDER 12</text>
+<text x="130" y="440" font-size="18" font-family="Segoe UI, sans-serif" fill="#a79fbf">Supplier: Metro Dairy</text>
+<rect x="50" y="500" width="500" height="170" rx="28" fill="url(#glass)" stroke="#ffb066" stroke-opacity=".6"/>
+<circle cx="100" cy="555" r="10" fill="#ffb066"/>
+<text x="130" y="563" font-size="26" font-family="Segoe UI, sans-serif">Tata Salt 1 kg</text>
+<text x="130" y="600" font-size="20" font-family="Consolas, monospace" fill="#ffb066">4 LEFT · REORDER 24</text>
+<text x="130" y="640" font-size="18" font-family="Segoe UI, sans-serif" fill="#a79fbf">Supplier: Krishna Traders</text>
+</g>
+</svg>

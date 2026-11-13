@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 680" role="img" aria-labelledby="t">
+<title id="t">GSTKaro dashboard on a shop counter: today's GST invoice beside a stock chart with two items running low</title>
+<defs>
+<radialGradient id="g1" cx="30%" cy="20%" r="60%"><stop offset="0" stop-color="#682ce4" stop-opacity=".55"/><stop offset="1" stop-color="#07030f" stop-opacity="0"/></radialGradient>
+<radialGradient id="g2" cx="80%" cy="75%" r="50%"><stop offset="0" stop-color="#327dff" stop-opacity=".35"/><stop offset="1" stop-color="#07030f" stop-opacity="0"/></radialGradient>
+<linearGradient id="bar" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#6d28d9"/><stop offset="1" stop-color="#c832ff"/></linearGradient>
+<linearGradient id="glass" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity=".09"/><stop offset="1" stop-color="#ffffff" stop-opacity=".02"/></linearGradient>
+</defs>
+<rect width="1200" height="680" fill="#07030f"/>
+<rect width="1200" height="680" fill="url(#g1)"/><rect width="1200" height="680" fill="url(#g2)"/>
+<g font-family="Georgia, serif" fill="#f3effc">
+<rect x="70" y="80" width="470" height="520" rx="28" fill="url(#glass)" stroke="#ffffff" stroke-opacity=".14"/>
+<text x="110" y="140" font-size="15" font-family="Consolas, monospace" fill="#f2a8ff" letter-spacing="3">TAX INVOICE · INV/26-27/0142</text>
+<text x="110" y="195" font-size="38" font-style="italic">Sharma General Store</text>
+<text x="110" y="225" font-size="15" font-family="Consolas, monospace" fill="#a79fbf">GSTIN 29ABCDE1234F1Z5 · Bengaluru</text>
+<g font-family="Segoe UI, sans-serif" font-size="18" fill="#d9d2ec">
+<line x1="110" y1="260" x2="500" y2="260" stroke="#ffffff" stroke-opacity=".15"/>
+<text x="110" y="295">Aashirvaad Atta 5 kg</text><text x="500" y="295" text-anchor="end">₹280.00</text>
+<text x="110" y="335">Lux Soap (4 pack)</text><text x="500" y="335" text-anchor="end">₹160.00</text>
+<text x="110" y="375">Philips LED 9 W</text><text x="500" y="375" text-anchor="end">₹200.00</text>
+<line x1="110" y1="400" x2="500" y2="400" stroke="#ffffff" stroke-opacity=".15"/>
+<text x="110" y="435" fill="#a79fbf">IGST (inter-state)</text><text x="500" y="435" text-anchor="end" fill="#a79fbf">₹58.00</text>
+</g>
+<text x="110" y="520" font-size="20" font-family="Segoe UI, sans-serif" fill="#a79fbf">Total</text>
+<text x="500" y="525" font-size="46" font-style="italic" text-anchor="end">₹698.00</text>
+<rect x="110" y="548" width="160" height="30" rx="15" fill="#8736f7"/><text x="190" y="569" font-size="14" font-family="Consolas, monospace" text-anchor="middle" letter-spacing="2">PAID · UPI</text>
+<rect x="590" y="80" width="540" height="520" rx="28" fill="url(#glass)" stroke="#ffffff" stroke-opacity=".14"/>
+<text x="630" y="140" font-size="15" font-family="Consolas, monospace" fill="#f2a8ff" letter-spacing="3">STOCK ON HAND · UNITS</text>
+<text x="630" y="195" font-size="38" font-style="italic">Two items need reorder</text>
+<g font-family="Consolas, monospace" font-size="13" fill="#a79fbf" text-anchor="middle">
+<rect x="650" y="300" width="56" height="230" rx="10" fill="url(#bar)"/><text x="678" y="560">ATTA</text>
+<rect x="730" y="340" width="56" height="190" rx="10" fill="url(#bar)"/><text x="758" y="560">SOAP</text>
+<rect x="810" y="490" width="56" height="40" rx="10" fill="#ffb066"/><text x="838" y="560" fill="#ffb066">BUTTER</text>
+<rect x="890" y="380" width="56" height="150" rx="10" fill="url(#bar)"/><text x="918" y="560">LED</text>
+<rect x="970" y="510" width="56" height="20" rx="8" fill="#ffb066"/><text x="998" y="560" fill="#ffb066">SALT</text>
+<line x1="640" y1="470" x2="1080" y2="470" stroke="#ffb066" stroke-dasharray="6 6"/><text x="1080" y="462" text-anchor="end" fill="#ffb066">REORDER LEVEL</text>
+</g>
+</g>
+</svg>

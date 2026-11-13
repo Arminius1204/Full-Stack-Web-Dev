@@ -1,0 +1,42 @@
+WEBVTT
+Kind: captions
+Language: en
+
+STYLE
+::cue { line-height: 1.4; }
+
+1
+00:00:00.600 --> 00:00:06.580 line:85% align:center
+<v Ravi>A customer from Chennai wants a bag of atta and some soap. How do I bill this?
+
+2
+00:00:07.030 --> 00:00:14.300 line:85% align:center
+<v Meera>Step one, pick the customer type. They have a <c.term>GSTIN</c>, so choose <c.term>business</c>.
+
+3
+00:00:14.750 --> 00:00:21.370 line:85% align:center
+<v Meera>Step two, <c.term>place of supply</c>. Chennai is in Tamil Nadu, which is another state.
+
+4
+00:00:21.820 --> 00:00:26.020 line:85% align:center
+<v Ravi>So no <c.term>CGST</c> and <c.term>SGST</c> on this bill?
+
+5
+00:00:26.470 --> 00:00:33.790 line:85% align:center
+<v Meera>Right. For an inter-state sale, the bill shows <c.term>IGST</c> instead, at the full rate.
+
+6
+00:00:34.240 --> 00:00:38.740 line:85% align:center
+<v Ravi>Then I tick the items, and the totals update by themselves?
+
+7
+00:00:39.190 --> 00:00:45.540 line:85% align:center
+<v Meera>Yes. <c.warn>Out of stock</c> items are greyed out, so you never bill what you do not have.
+
+8
+00:00:45.990 --> 00:00:48.020 line:85% align:center
+<v Ravi>And how do I print it?
+
+9
+00:00:48.470 --> 00:00:54.110 line:85% align:center
+<v Meera>Press <c.term>Ctrl + P</c>. The page prints as a proper A4 tax invoice.
